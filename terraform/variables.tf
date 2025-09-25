@@ -3,13 +3,19 @@ variable "aws_region" {
 }
 
 variable "key_name" {
-  description = "case-1"
+  default     = "case-1"
+  description = "EC2 key pair name"
 }
+
 
 variable "github_username" {
-  description = "rushi2207"
+  default     = "rushi2207"
+  description = "GitHub username"
 }
 
+
+
 variable "github_repo" {
-  description = "https://github.com/rushi2207/Simple-react-app.git"
+  default     = "https://github.com/rushi2207/Simple-react-app.git"
+  description = "GitHub repo URL"
 }
