@@ -9,7 +9,6 @@ resource "aws_instance" "react_app" {
 
   vpc_security_group_ids = [aws_security_group.react_sg.id]
 
-  user_data = <<EOF
 #!/bin/bash
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
@@ -17,15 +16,15 @@ echo "===== USER DATA STARTED ====="
 
 # Update & install basics
 apt-get update -y
-apt-get install -y curl git nodejs npm nginx
+apt-get install -y curl git nginx
 
-# Install latest Node.js
-npm install -g n
-n stable
+# Install Node.js LTS
+curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+apt-get install -y nodejs build-essential
 
-# Clone your repo
+# Clone repo
 rm -rf /home/ubuntu/reactapp
-git clone https://github.com/${var.github_username}/${var.github_repo}.git /home/ubuntu/reactapp
+git clone ${var.github_repo} /home/ubuntu/reactapp
 cd /home/ubuntu/reactapp
 
 # Build react app
@@ -41,12 +40,11 @@ chown -R www-data:www-data /var/www/html
 chmod -R 755 /var/www/html
 
 # Restart nginx
+sleep 5
 systemctl enable nginx
 systemctl restart nginx
 
 echo "===== USER DATA FINISHED ====="
-EOF
-
 
   tags = {
     Name = "react-app-server"
