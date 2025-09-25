@@ -1,12 +1,10 @@
 import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App"; // <- Move your App component to a separate file 'App.js'
 
-function App() {
-  return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Welcome to My Web Page 🚀</h1>
-      <p>This page is deployed on AWS EC2 using Terraform!</p>
-    </div>
-  );
-}
-
-export default App;
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
