@@ -11,25 +11,29 @@ resource "aws_instance" "react_app" {
 
   user_data = <<-EOF
     #!/bin/bash
+    exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
     apt update -y
     apt install -y curl git nodejs npm nginx
 
-    # Get latest node
+    # Install latest Node.js
     npm install -g n
     n stable
 
-    # Clone your repo
+    # Clone your repo (fresh every time)
+    rm -rf /home/ubuntu/reactapp
     git clone https://github.com/${var.github_username}/${var.github_repo}.git /home/ubuntu/reactapp
     cd /home/ubuntu/reactapp
 
-    # Build react app
+    # Install deps & build React
     npm install
     npm run build
 
-    # Serve with nginx
+    # Replace nginx root with React build
     rm -rf /var/www/html/*
     cp -r build/* /var/www/html/
 
+    # Restart nginx
     systemctl enable nginx
     systemctl restart nginx
   EOF
