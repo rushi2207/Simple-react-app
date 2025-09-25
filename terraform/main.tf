@@ -9,7 +9,7 @@ resource "aws_instance" "react_app" {
 
   vpc_security_group_ids = [aws_security_group.react_sg.id]
 
-  user_data = <<-EOF
+    user_data = <<-EOF
     #!/bin/bash
     exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
@@ -20,7 +20,7 @@ resource "aws_instance" "react_app" {
     npm install -g n
     n stable
 
-    # Clone your repo (fresh every time)
+    # Clone your repo
     rm -rf /home/ubuntu/reactapp
     git clone https://github.com/${var.github_username}/${var.github_repo}.git /home/ubuntu/reactapp
     cd /home/ubuntu/reactapp
@@ -33,10 +33,15 @@ resource "aws_instance" "react_app" {
     rm -rf /var/www/html/*
     cp -r build/* /var/www/html/
 
+    # Fix permissions so nginx can read
+    chown -R www-data:www-data /var/www/html
+    chmod -R 755 /var/www/html
+
     # Restart nginx
     systemctl enable nginx
     systemctl restart nginx
   EOF
+
 
   tags = {
     Name = "react-app-server"
