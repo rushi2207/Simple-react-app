@@ -11,5 +11,5 @@ variable "github_username" {
 }
 
 variable "github_repo" {
-  description = "Your GitHub repository name"
+  description = "https://github.com/rushi2207/Simple-react-app.git"
 }
