@@ -9,38 +9,43 @@ resource "aws_instance" "react_app" {
 
   vpc_security_group_ids = [aws_security_group.react_sg.id]
 
-    user_data = <<-EOF
-    #!/bin/bash
-    exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+  user_data = <<EOF
+#!/bin/bash
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
-    apt update -y
-    apt install -y curl git nodejs npm nginx
+echo "===== USER DATA STARTED ====="
 
-    # Install latest Node.js
-    npm install -g n
-    n stable
+# Update & install basics
+apt-get update -y
+apt-get install -y curl git nodejs npm nginx
 
-    # Clone your repo
-    rm -rf /home/ubuntu/reactapp
-    git clone https://github.com/${var.github_username}/${var.github_repo}.git /home/ubuntu/reactapp
-    cd /home/ubuntu/reactapp
+# Install latest Node.js
+npm install -g n
+n stable
 
-    # Install deps & build React
-    npm install
-    npm run build
+# Clone your repo
+rm -rf /home/ubuntu/reactapp
+git clone https://github.com/${var.github_username}/${var.github_repo}.git /home/ubuntu/reactapp
+cd /home/ubuntu/reactapp
 
-    # Replace nginx root with React build
-    rm -rf /var/www/html/*
-    cp -r build/* /var/www/html/
+# Build react app
+npm install
+npm run build
 
-    # Fix permissions so nginx can read
-    chown -R www-data:www-data /var/www/html
-    chmod -R 755 /var/www/html
+# Copy build files to nginx root
+rm -rf /var/www/html/*
+cp -r build/* /var/www/html/
 
-    # Restart nginx
-    systemctl enable nginx
-    systemctl restart nginx
-  EOF
+# Fix permissions
+chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www/html
+
+# Restart nginx
+systemctl enable nginx
+systemctl restart nginx
+
+echo "===== USER DATA FINISHED ====="
+EOF
 
 
   tags = {
