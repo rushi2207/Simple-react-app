@@ -3,11 +3,11 @@ variable "aws_region" {
 }
 
 variable "key_name" {
-  description = "Name of the AWS key pair"
+  description = "case-1"
 }
 
 variable "github_username" {
-  description = "Your GitHub username"
+  description = "rushi2207"
 }
 
 variable "github_repo" {
